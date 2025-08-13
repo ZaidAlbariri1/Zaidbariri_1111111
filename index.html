@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خدمة توصيل الكتب المستعملة</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; }
+        .book-card { transition: transform 0.2s; }
+        .book-card:hover { transform: scale(1.03); }
+        footer { background-color: #343a40; color: white; padding: 20px 0; margin-top: auto; }
+        footer a { color: #ffc107; margin: 0 10px; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body class="container py-4">
+
+    <!-- شريط العنوان -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 id="title">📚 خدمة توصيل الكتب المستعملة</h1>
+        <button class="btn btn-primary" onclick="toggleLanguage()">English</button>
+    </div>
+
+    <!-- مربع البحث -->
+    <div class="input-group mb-4">
+        <input type="text" id="searchInput" class="form-control" placeholder="🔍 ابحث عن كتاب أو مؤلف">
+    </div>
+
+    <!-- نموذج إضافة كتاب -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4 id="addBookTitle">➕ إضافة كتاب جديد</h4>
+            <form id="bookForm" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" id="bookTitle" placeholder="عنوان الكتاب" required>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" id="bookAuthor" placeholder="اسم المؤلف" required>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" class="form-control" id="bookPrice" placeholder="السعر" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success w-100" id="addBtn">إضافة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- قائمة الكتب -->
+    <div class="row" id="bookList"></div>
+
+    <!-- Footer -->
+    <footer class="text-center mt-4">
+        <p>Created by: Laith Thawabteh | Phone: +962791111279</p>
+        <div>
+            <a href="https://www.facebook.com" target="_blank">Facebook</a> |
+            <a href="https://www.instagram.com" target="_blank">Instagram</a>
+        </div>
+    </footer>
+
+    <script>
+        let books = [
+            { title: "مقدمة في البرمجة", author: "أحمد محمد", price: "5" },
+            { title: "الذكاء الاصطناعي", author: "سارة علي", price: "8" },
+            { title: "علوم البيانات", author: "خالد يوسف", price: "10" }
+        ];
+
+        let isArabic = true;
+        let searchQuery = "";
+
+        function renderBooks() {
+            const bookList = document.getElementById('bookList');
+            bookList.innerHTML = '';
+
+            // تصفية النتائج بناء على البحث
+            const filteredBooks = books.filter(book =>
+                book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                book.author.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+
+            if (filteredBooks.length === 0) {
+                bookList.innerHTML = `<p class="text-muted">${isArabic ? "لا توجد كتب مطابقة" : "No matching books found"}</p>`;
+                return;
+            }
+
+            filteredBooks.forEach((book, index) => {
+                bookList.innerHTML += `
+                    <div class="col-md-4 mb-3">
+                        <div class="card book-card shadow-sm">
+                            <div class="card-body">
+                                <h5>${book.title}</h5>
+                                <p>${isArabic ? "المؤلف" : "Author"}: ${book.author}</p>
+                                <p>${isArabic ? "السعر" : "Price"}: ${book.price} ${isArabic ? "دينار" : "JOD"}</p>
+                                <button class="btn btn-danger btn-sm" onclick="deleteBook(${index})">
+                                    ${isArabic ? "🗑 حذف" : "🗑 Delete"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function deleteBook(index) {
+            books.splice(index, 1);
+            renderBooks();
+        }
+
+        document.getElementById('bookForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('bookTitle').value;
+            const author = document.getElementById('bookAuthor').value;
+            const price = document.getElementById('bookPrice').value;
+
+            books.push({ title, author, price });
+            renderBooks();
+
+            this.reset();
+        });
+
+        // البحث الفوري
+        document.getElementById('searchInput').addEventListener('input', function() {
+            searchQuery = this.value;
+            renderBooks();
+        });
+
+        function toggleLanguage() {
+            isArabic = !isArabic;
+            document.documentElement.lang = isArabic ? "ar" : "en";
+            document.documentElement.dir = isArabic ? "rtl" : "ltr";
+
+            document.getElementById('title').innerText = isArabic ? "📚 خدمة توصيل الكتب المستعملة" : "📚 Used Books Delivery Service";
+            document.getElementById('addBookTitle').innerText = isArabic ? "➕ إضافة كتاب جديد" : "➕ Add New Book";
+            document.getElementById('addBtn').innerText = isArabic ? "إضافة" : "Add";
+            document.getElementById('searchInput').placeholder = isArabic ? "🔍 ابحث عن كتاب أو مؤلف" : "🔍 Search by book or author";
+            document.querySelector('button.btn-primary').innerText = isArabic ? "English" : "العربية";
+
+            renderBooks();
+        }
+
+        renderBooks();
+    </script>
+</body>
+</html>
